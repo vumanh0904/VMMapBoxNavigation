@@ -29,7 +29,7 @@ let mapsVersion: Version = "11.6.0-beta.1"
 let mapboxApiDownloads = "https://api.mapbox.com/downloads/v2"
 
 let package = Package(
-    name: "MapboxNavigation",
+    name: "VMMapBoxNavigation",
     defaultLocalization: "en",
     platforms: [.iOS(.v14)],
     products: [
