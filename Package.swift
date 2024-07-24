@@ -42,8 +42,8 @@ let package = Package(
             targets: ["MapboxNavigationCore"]
         ),
         .library(
-            name: "VMMapBoxNavigation",
-            targets: ["VMMapBoxNavigation"]
+            name: "_MapboxNavigationTestKit",
+            targets: ["_MapboxNavigationTestKit"]
         ),
     ],
     dependencies: [
@@ -142,20 +142,13 @@ let package = Package(
                 "__Snapshots__", // Ignore snapshots folder
             ]
         ),
-        
-            .target(
-                name: "VMMapBoxNavigation"),
-            .testTarget(
-                name: "VMMapBoxNavigationTests",
-                dependencies: ["VMMapBoxNavigation"]),
-
-//        .target(
-//            name: "_MapboxNavigationTestKit",
-//            dependencies: [
-//                .product(name: "SnapshotTesting", package: "swift-snapshot-testing"),
-//                "_MapboxNavigationTestHelpers",
-//            ],
-//            path: "Sources/.empty/_MapboxNavigationTestKit"
-//        )
+        .target(
+            name: "_MapboxNavigationTestKit",
+            dependencies: [
+                .product(name: "SnapshotTesting", package: "swift-snapshot-testing"),
+                "_MapboxNavigationTestHelpers",
+            ],
+            path: "Sources/.empty/_MapboxNavigationTestKit"
+        )
     ]
 )
