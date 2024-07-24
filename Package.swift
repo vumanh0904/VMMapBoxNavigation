@@ -41,10 +41,10 @@ let package = Package(
             name: "MapboxNavigationCore",
             targets: ["MapboxNavigationCore"]
         ),
-//        .library(
-//            name: "_MapboxNavigationTestKit",
-//            targets: ["_MapboxNavigationTestKit"]
-//        ),
+        .library(
+            name: "VMMapBoxNavigation",
+            targets: ["VMMapBoxNavigation"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/mapbox/mapbox-navigation-native-ios.git", revision: navNativeRevision),
@@ -142,6 +142,13 @@ let package = Package(
                 "__Snapshots__", // Ignore snapshots folder
             ]
         ),
+        
+            .target(
+                name: "VMMapBoxNavigation"),
+            .testTarget(
+                name: "VMMapBoxNavigationTests",
+                dependencies: ["VMMapBoxNavigation"]),
+
 //        .target(
 //            name: "_MapboxNavigationTestKit",
 //            dependencies: [
