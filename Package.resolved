@@ -1,5 +1,5 @@
 {
-  "originHash" : "7d9d5eaef46ccf652cbe57668968825af17cb29671b682c1ddf26d9380f72107",
+  "originHash" : "029927d3915b91bf96f3b2b212f0e3ffd1c92546b6a0331bc8ec09cb9ce32dce",
   "pins" : [
     {
       "identity" : "cwlcatchexception",
@@ -89,6 +89,15 @@
       "state" : {
         "revision" : "353f80378dcd8f17eefe8550090c6b1ae3c9da23",
         "version" : "5.1.0"
+      }
+    },
+    {
+      "identity" : "solar",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ceeK/Solar.git",
+      "state" : {
+        "revision" : "c2b96f2d5fb7f835b91cefac5e83101f54643901",
+        "version" : "3.0.1"
       }
     },
     {
