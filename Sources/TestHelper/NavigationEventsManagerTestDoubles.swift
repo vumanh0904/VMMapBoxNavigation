@@ -1,104 +1,215 @@
 import CoreLocation
 import Foundation
-@_spi(MapboxInternal) @testable import MapboxNavigationCore
+@_spi(MapboxInternal) @testable import MapboxCoreNavigation
 
-public final class NavigationTelemetryManagerSpy: NavigationTelemetryManager {
-    public var userInfo: [String: String?]?
+public class PassiveNavigationDataSourceSpy: PassiveNavigationEventsManagerDataSource {
+    public var rawLocation: CLLocation? = nil
+    public var locationManagerType: MapboxCoreNavigation.NavigationLocationManager.Type = NavigationLocationManagerSpy.self
+}
 
+public class NavigationEventsManagerSpy: NavigationEventsManager {
+    private let passiveNavigationDataSource: PassiveNavigationDataSourceSpy
+    
+    var debuggableEvents = [NavigationEventDetails]()
+    var locations = [CLLocation]()
+    var totalDistanceCompleted: CLLocationDistance = 0
+
+    var createFeedbackCalled = false
+    var sendActiveNavigationFeedbackCalled = false
+    var sendPassiveNavigationFeedbackCalled = false
     var sendCarPlayConnectEventCalled = false
     var sendCarPlayDisconnectEventCalled = false
-    var sendPassiveNavigationFeedbackCalled = false
-    var sendActiveNavigationFeedbackCalled = false
-    var createFeedbackCalled = false
-    var sendNavigationFeedbackCalled = false
+    var sendRouteRetrievalEventCalled = false
+    var sendCancelEventCalled = false
+    var sendPassiveNavigationStartCalled = false
+    var sendPassiveNavigationStopCalled = false
+    var resetSessionCalled = false
+    var enqueueRerouteEventCalled = false
+    var reportRerouteCalled = false
+    var updateProgressCalled = false
+    var incrementDistanceTraveledCalled = false
+    var arriveAtWaypointCalled = false
+    var arriveAtDestinationCalled = false
+
+    var passedFeedbackEvent: FeedbackEvent?
+    var passedSource: FeedbackSource?
+    var passedActiveNavigationType: ActiveNavigationFeedbackType?
+    var passedPassiveNavigationType: PassiveNavigationFeedbackType?
+    var passedDescription: String?
+    var passedCompletionHandler: UserFeedbackCompletionHandler?
+    var passedRating: Int?
+    var passedComment: String?
 
     var returnedFeedbackEvent: FeedbackEvent? = Fixture.createFeedbackEvent()
-    var returnedUserFeedback: MapboxNavigationCore.UserFeedback = .init(
-        description: "feedback",
-        type: ActiveNavigationFeedbackType.illegalTurn,
-        source: .user,
-        screenshot: nil,
-        location: .init(latitude: 1, longitude: 1)
-    )
 
-    var passedActiveNavigationFeedbackType: ActiveNavigationFeedbackType?
-    var passedPassiveNavigationFeedbackType: PassiveNavigationFeedbackType?
-    var passedDescription: String?
-    var passedSource: FeedbackSource?
-    var passedFeedbackEvent: MapboxNavigationCore.FeedbackEvent?
-    var passedType: MapboxNavigationCore.FeedbackType?
-
-    init() {}
-
-    public func sendCarPlayConnectEvent() {
-        sendCarPlayConnectEventCalled = true
+    required public init() {
+        passiveNavigationDataSource = PassiveNavigationDataSourceSpy()
+        super.init(activeNavigationDataSource: nil,
+                   passiveNavigationDataSource: passiveNavigationDataSource,
+                   accessToken: "fake token")
     }
 
-    public func sendCarPlayDisconnectEvent() {
-        sendCarPlayDisconnectEventCalled = true
+    required convenience init(activeNavigationDataSource: ActiveNavigationEventsManagerDataSource? = nil, passiveNavigationDataSource: PassiveNavigationEventsManagerDataSource? = nil, accessToken possibleToken: String? = nil) {
+        self.init()
     }
 
-    public func createFeedback(screenshotOption: FeedbackScreenshotOption) async -> MapboxNavigationCore
-    .FeedbackEvent? {
+    func reset() {
+        createFeedbackCalled = false
+        sendActiveNavigationFeedbackCalled = false
+        sendPassiveNavigationFeedbackCalled = false
+        sendCarPlayConnectEventCalled = false
+        sendCarPlayDisconnectEventCalled = false
+        sendRouteRetrievalEventCalled = false
+        sendCancelEventCalled = false
+        sendPassiveNavigationStartCalled = false
+        sendPassiveNavigationStopCalled = false
+        resetSessionCalled = false
+        enqueueRerouteEventCalled = false
+        reportRerouteCalled = false
+        updateProgressCalled = false
+        incrementDistanceTraveledCalled = false
+        arriveAtWaypointCalled = false
+        arriveAtDestinationCalled = false
+        locations.removeAll()
+    }
+
+    public override func createFeedback(screenshotOption: FeedbackScreenshotOption) -> FeedbackEvent? {
         createFeedbackCalled = true
         return returnedFeedbackEvent
     }
 
-    public func sendActiveNavigationFeedback(
-        _ feedback: MapboxNavigationCore.FeedbackEvent,
-        type: MapboxNavigationCore.ActiveNavigationFeedbackType,
-        description: String?,
-        source: MapboxNavigationCore.FeedbackSource
-    ) async throws -> MapboxNavigationCore.UserFeedback {
+    public override func sendActiveNavigationFeedback(_ feedback: FeedbackEvent,
+                                                      type: MapboxCoreNavigation.ActiveNavigationFeedbackType,
+                                                      description: String?) {
         sendActiveNavigationFeedbackCalled = true
         passedFeedbackEvent = feedback
-        passedActiveNavigationFeedbackType = type
-        passedDescription = description
-        passedSource = source
-        return returnedUserFeedback
     }
 
-    public func sendPassiveNavigationFeedback(
-        _ feedback: MapboxNavigationCore.FeedbackEvent,
-        type: MapboxNavigationCore.PassiveNavigationFeedbackType,
-        description: String?,
-        source: MapboxNavigationCore.FeedbackSource
-    ) async throws -> MapboxNavigationCore.UserFeedback {
+    public override func sendPassiveNavigationFeedback(_ feedback: FeedbackEvent,
+                                                       type: MapboxCoreNavigation.PassiveNavigationFeedbackType,
+                                                       description: String?) {
         sendPassiveNavigationFeedbackCalled = true
         passedFeedbackEvent = feedback
-        passedPassiveNavigationFeedbackType = type
-        passedDescription = description
-        passedSource = source
-        return returnedUserFeedback
     }
 
-    public func sendNavigationFeedback(
-        _ feedback: MapboxNavigationCore.FeedbackEvent,
-        type: MapboxNavigationCore.FeedbackType,
-        description: String?,
-        source: MapboxNavigationCore.FeedbackSource
-    ) async throws -> MapboxNavigationCore.UserFeedback {
-        sendNavigationFeedbackCalled = true
+    @_spi(MapboxInternal)
+    public override func sendActiveNavigationFeedback(_ feedback: FeedbackEvent,
+                                                      type: ActiveNavigationFeedbackType,
+                                                      description: String?,
+                                                      source: FeedbackSource,
+                                                      completionHandler: UserFeedbackCompletionHandler?) {
+        sendActiveNavigationFeedbackCalled = true
         passedFeedbackEvent = feedback
-        passedType = type
+        passedActiveNavigationType = type
         passedDescription = description
         passedSource = source
-        return returnedUserFeedback
+        passedCompletionHandler = completionHandler
     }
 
-    public func reset() {
-        sendCarPlayConnectEventCalled = false
-        sendCarPlayDisconnectEventCalled = false
-        sendPassiveNavigationFeedbackCalled = false
-        sendActiveNavigationFeedbackCalled = false
-        createFeedbackCalled = false
-        sendNavigationFeedbackCalled = false
+    @_spi(MapboxInternal)
+    public override func sendPassiveNavigationFeedback(_ feedback: FeedbackEvent,
+                                                       type: PassiveNavigationFeedbackType,
+                                                       description: String?,
+                                                       source: FeedbackSource,
+                                                       completionHandler: UserFeedbackCompletionHandler?) {
+        sendPassiveNavigationFeedbackCalled = true
+        passedFeedbackEvent = feedback
+        passedPassiveNavigationType = type
+        passedDescription = description
+        passedSource = source
+        passedCompletionHandler = completionHandler
+    }
 
-        passedActiveNavigationFeedbackType = nil
-        passedPassiveNavigationFeedbackType = nil
-        passedDescription = nil
-        passedSource = nil
-        passedFeedbackEvent = nil
-        passedType = nil
+    public override func sendCarPlayConnectEvent() {
+        sendCarPlayConnectEventCalled = true
+    }
+
+    public override func sendCarPlayDisconnectEvent() {
+        sendCarPlayDisconnectEventCalled = true
+    }
+
+    public override func record(_ locations: [CLLocation]) {
+        self.locations.append(contentsOf: locations)
+    }
+
+    public override func enqueueRerouteEvent() {
+        enqueueRerouteEventCalled = true
+    }
+
+    public override func sendRouteRetrievalEvent() {
+        sendRouteRetrievalEventCalled = true
+    }
+
+    public override func sendCancelEvent(rating: Int?, comment: String?) {
+        sendCancelEventCalled = true
+        passedRating = rating
+        passedComment = comment
+    }
+
+    public override func sendPassiveNavigationStart() {
+        sendPassiveNavigationStartCalled = true
+    }
+
+    public override func sendPassiveNavigationStop() {
+        sendPassiveNavigationStopCalled = true
+    }
+
+    public override func resetSession() {
+        resetSessionCalled = true
+    }
+
+    public override func reportReroute(progress: RouteProgress, proactive: Bool) {
+        reportRerouteCalled = true
+    }
+
+    public override func update(progress: RouteProgress) {
+        updateProgressCalled = true
+    }
+
+    public override func incrementDistanceTraveled(by distance: CLLocationDistance) {
+        incrementDistanceTraveledCalled = true
+        totalDistanceCompleted += distance
+    }
+
+    public override func arriveAtWaypoint() {
+        arriveAtWaypointCalled = true
+    }
+
+    public override func arriveAtDestination() {
+        arriveAtDestinationCalled = true
+    }
+
+}
+
+public class CLHeadingSpy: CLHeading {
+    private var heading: Double
+    private var accuracy: Double
+
+    public init(heading: Double, accuracy: Double) {
+        self.heading = heading
+        self.accuracy = accuracy
+        super.init()
+    }
+    
+    public required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    public override var magneticHeading: CLLocationDirection {
+        get {
+            return heading
+        }
+        set {
+            heading = newValue
+        }
+    }
+
+    public override var headingAccuracy: CLLocationDirection {
+        get {
+            return accuracy
+        }
+        set {
+            accuracy = newValue
+        }
     }
 }

@@ -1,56 +1,34 @@
-import Combine
-import CoreLocation
-import MapboxCommon
-import MapboxDirections
-@testable import MapboxNavigationCore
+import Foundation
 import XCTest
+import MapboxDirections
+@testable import MapboxCoreNavigation
+#if canImport(MapboxMaps)
+import MapboxMaps
+#endif
 
 /// Base Mapbox XCTestCase class with common setup logic
 open class TestCase: XCTestCase {
-    public var navigationProvider: MapboxNavigationProvider!
     public var billingServiceMock: BillingServiceMock!
-    public var coreConfig: CoreConfig!
-    public var locationPublisher: CurrentValueSubject<CLLocation, Never>!
-    public var eventsManagerSpy: NavigationTelemetryManagerSpy!
 
     /// Inidicates whether one time initialization completed in ``initializeIfNeeded`` method.
     private static var isInitializationCompleted: Bool = false
 
-    override open class func setUp() {
+    open override class func setUp() {
         super.setUp()
-        Credentials.injectSharedToken()
         initializeIfNeeded()
     }
 
-    @MainActor
-    override open func setUp() async throws {
-        try? await super.setUp()
-
+    open override func setUp() {
+        super.setUp()
         billingServiceMock = .init()
-        let billingHandler = BillingHandler.__createMockedHandler(with: billingServiceMock)
-        let credentials = NavigationCoreApiConfiguration(accessToken: .mockedAccessToken)
-        coreConfig = CoreConfig(credentials: credentials)
-        coreConfig.__customBillingHandler = BillingHandlerProvider(billingHandler)
-        let location = CLLocation(latitude: 9.519172, longitude: 47.210823)
-        locationPublisher = .init(location)
-        coreConfig
-            .locationSource = .custom(.spyLocationManager(locationPublisher: locationPublisher.eraseToAnyPublisher()))
-        eventsManagerSpy = NavigationTelemetryManagerSpy()
-        eventsManagerSpy.userInfo = ["key": "value"]
-        let eventsManager = NavigationEventsManager(navNativeEventsManager: eventsManagerSpy)
-        coreConfig.__customEventsManager = .init(eventsManager)
-        navigationProvider = MapboxNavigationProvider(coreConfig: coreConfig)
+        BillingHandler.__replaceSharedInstance(with: BillingHandler.__createMockedHandler(with: billingServiceMock))
     }
 
-    @MainActor
-    override open func tearDown() {
-        navigationProvider = nil
+    open override func tearDown() {
         super.tearDown()
-    }
-
-    override open class func tearDown() {
-        Credentials.clearInjectSharedToken()
-        super.tearDown()
+        // Reset navigator
+        CoreNavigatorSpy.reset()
+        Self.configureSettings()
     }
 
     /// Prepares tests for execution. Should be called once before any test runs.
@@ -58,7 +36,20 @@ open class TestCase: XCTestCase {
         guard !isInitializationCompleted else { return }
         isInitializationCompleted = true
 
+        configureSettings()
+        Credentials.injectSharedToken(.mockedAccessToken)
+        #if canImport(MapboxMaps)
+        ResourceOptionsManager.default.resourceOptions.accessToken = .mockedAccessToken
+        #endif
         UserDefaults.standard.set("Location Usage Description", forKey: "NSLocationWhenInUseUsageDescription")
         UserDefaults.standard.set("Location Usage Description", forKey: "NSLocationAlwaysAndWhenInUseUsageDescription")
+    }
+
+    private static func configureSettings() {
+        let settingsValues = NavigationSettings.Values(directions: .mocked,
+                                                       tileStoreConfiguration: .default,
+                                                       routingProviderSource: .hybrid,
+                                                       alternativeRouteDetectionStrategy: .init())
+        NavigationSettings.shared.initialize(with: settingsValues)
     }
 }

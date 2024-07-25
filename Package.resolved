@@ -1,12 +1,31 @@
 {
+  "originHash" : "7d9d5eaef46ccf652cbe57668968825af17cb29671b682c1ddf26d9380f72107",
   "pins" : [
+    {
+      "identity" : "cwlcatchexception",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mattgallagher/CwlCatchException.git",
+      "state" : {
+        "revision" : "3ef6999c73b6938cc0da422f2c912d0158abb0a0",
+        "version" : "2.2.0"
+      }
+    },
+    {
+      "identity" : "cwlpreconditiontesting",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mattgallagher/CwlPreconditionTesting.git",
+      "state" : {
+        "revision" : "2ef56b2caf25f55fa7eef8784c30d5a767550f54",
+        "version" : "2.2.1"
+      }
+    },
     {
       "identity" : "mapbox-common-ios",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mapbox/mapbox-common-ios.git",
       "state" : {
-        "revision" : "03c1b2ee8d57d1fa95af7c472c9707cb897b2376",
-        "version" : "24.6.0-beta.1"
+        "revision" : "c2aa7022afdcf5a070ace4e3b608562101a04690",
+        "version" : "23.10.1"
       }
     },
     {
@@ -14,8 +33,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mapbox/mapbox-core-maps-ios.git",
       "state" : {
-        "revision" : "86992e7b2604282fc10680e524a2a67a4586df05",
-        "version" : "11.6.0-beta.1"
+        "revision" : "51f776b11bcff34ced88fcf14e4ed9c568257232",
+        "version" : "10.18.0"
+      }
+    },
+    {
+      "identity" : "mapbox-directions-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mapbox/mapbox-directions-swift.git",
+      "state" : {
+        "revision" : "6512320ee7f0091a4c55abe2bc6414f078da88c8",
+        "version" : "2.14.0"
       }
     },
     {
@@ -23,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mapbox/mapbox-maps-ios.git",
       "state" : {
-        "revision" : "86476e9828bb3a61527a00f767d45a19f93219f5",
-        "version" : "11.6.0-beta.1"
+        "revision" : "8ef49bb140bbd5d51917f1e69d4c3949a176c009",
+        "version" : "10.18.2"
       }
     },
     {
@@ -32,7 +60,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mapbox/mapbox-navigation-native-ios.git",
       "state" : {
-        "revision" : "921432e3817004d11f3f067b03d080713e80060b"
+        "revision" : "b1c9d09cca14c69455f2ce79dc588f2ae06bde37",
+        "version" : "204.0.1"
+      }
+    },
+    {
+      "identity" : "mapbox-speech-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mapbox/mapbox-speech-swift.git",
+      "state" : {
+        "revision" : "a9ef284deae227c6111c27a3535098c1e9a9d8e3",
+        "version" : "2.1.1"
       }
     },
     {
@@ -45,12 +83,30 @@
       }
     },
     {
+      "identity" : "polyline",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/raphaelmor/Polyline.git",
+      "state" : {
+        "revision" : "353f80378dcd8f17eefe8550090c6b1ae3c9da23",
+        "version" : "5.1.0"
+      }
+    },
+    {
+      "identity" : "swift-argument-parser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-argument-parser",
+      "state" : {
+        "revision" : "41982a3656a71c768319979febd796c6fd111d5c",
+        "version" : "1.5.0"
+      }
+    },
+    {
       "identity" : "swift-snapshot-testing",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-snapshot-testing.git",
       "state" : {
-        "revision" : "26ed3a2b4a2df47917ca9b790a57f91285b923fb",
-        "version" : "1.12.0"
+        "revision" : "f8a9c997c3c1dab4e216a8ec9014e23144cbab37",
+        "version" : "1.9.0"
       }
     },
     {
@@ -63,5 +119,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

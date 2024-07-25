@@ -1,5 +1,5 @@
-@_implementationOnly import MapboxCommon_Private
 import MapboxNavigationNative
+@_implementationOnly import MapboxCommon_Private
 @_implementationOnly import MapboxNavigationNative_Private
 
 public class RerouteDetectorSpy: RerouteDetectorInterface {
@@ -8,15 +8,16 @@ public class RerouteDetectorSpy: RerouteDetectorInterface {
     public var forceRerouteCalled = false
     public var returnedIsReroute = false
 
-    public func forceReroute(for reason: ForceRerouteReason) {
+    public func forceReroute() {
         forceRerouteCalled = true
     }
 
-    public func forceReroute(for reason: ForceRerouteReason, callback: @escaping ForceRerouteCallback) {
+    public func forceReroute(forCallback callback: @escaping ForceRerouteCallback) {
         forceRerouteCalled = true
     }
 
     public func isReroute() -> Bool {
         return returnedIsReroute
     }
+
 }

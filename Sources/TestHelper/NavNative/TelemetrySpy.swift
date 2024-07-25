@@ -1,5 +1,5 @@
-@testable import MapboxNavigationCore
 import MapboxNavigationNative
+@testable import MapboxCoreNavigation
 @_implementationOnly import MapboxNavigationNative_Private
 
 class TelemetrySpy: Telemetry {
@@ -11,14 +11,14 @@ class TelemetrySpy: Telemetry {
 
     var returnedUserFeedbackHandle: UserFeedbackHandle
     var passedAction: OuterDeviceAction?
-    var passedUserFeedback: MapboxNavigationNative.UserFeedback?
+    var passedUserFeedback: UserFeedback?
     var passedUserFeedbackCallback: UserFeedbackCallback?
     var passedFeedbackMetadata: UserFeedbackMetadata?
 
     init() {
         let navigator = NativeNavigatorSpy()
         let telemetry = navigator.getTelemetryForEventsMetadataProvider(EventsMetadataInterfaceSpy())
-        self.returnedUserFeedbackHandle = telemetry.startBuildUserFeedbackMetadata()
+        returnedUserFeedbackHandle = telemetry.startBuildUserFeedbackMetadata()
     }
 
     func postCustomEvent(forType type: String, version: String, payload: String?) {
@@ -35,11 +35,9 @@ class TelemetrySpy: Telemetry {
         return returnedUserFeedbackHandle
     }
 
-    func postUserFeedback(
-        for feedbackMetadata: UserFeedbackMetadata,
-        userFeedback: MapboxNavigationNative.UserFeedback,
-        callback: @escaping UserFeedbackCallback
-    ) {
+    func postUserFeedback(for feedbackMetadata: UserFeedbackMetadata,
+                          userFeedback: UserFeedback,
+                          callback: @escaping UserFeedbackCallback) {
         postUserFeedbackCalled = true
         passedFeedbackMetadata = feedbackMetadata
         passedUserFeedback = userFeedback
@@ -51,12 +49,10 @@ class TelemetrySpy: Telemetry {
     }
 }
 
-class NativeUserFeedbackHandleSpy: NativeUserFeedbackHandle, @unchecked Sendable {
-    var returnedUserFeedbackMetadata: UserFeedbackMetadata = .init(
-        locationsBefore: [],
-        locationsAfter: [],
-        step: nil
-    )
+class NativeUserFeedbackHandleSpy: NativeUserFeedbackHandle {
+    var returnedUserFeedbackMetadata: UserFeedbackMetadata = .init(locationsBefore: [],
+                                                                   locationsAfter: [],
+                                                                   step: nil)
 
     func getMetadata() -> UserFeedbackMetadata {
         returnedUserFeedbackMetadata
@@ -64,17 +60,21 @@ class NativeUserFeedbackHandleSpy: NativeUserFeedbackHandle, @unchecked Sendable
 }
 
 final class EventsMetadataInterfaceSpy: EventsMetadataInterface {
+    var returnedScreenshot: ScreenshotFormat?
+
     func provideEventsMetadata() -> EventsMetadata {
-        .init(
-            volumeLevel: nil,
-            audioType: nil,
-            screenBrightness: nil,
-            percentTimeInForeground: nil,
-            percentTimeInPortrait: nil,
-            batteryPluggedIn: nil,
-            batteryLevel: nil,
-            connectivity: "",
-            appMetadata: nil
-        )
+        .init(volumeLevel: nil,
+              audioType: nil,
+              screenBrightness: nil,
+              percentTimeInForeground: nil,
+              percentTimeInPortrait: nil,
+              batteryPluggedIn: nil,
+              batteryLevel: nil,
+              connectivity: "",
+              appMetadata: nil)
+    }
+
+    func screenshot(forCallback callback: @escaping ScreenshotCallback) {
+        callback(returnedScreenshot)
     }
 }
